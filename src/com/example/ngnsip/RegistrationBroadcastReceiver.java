@@ -1,4 +1,4 @@
-package com.example.testjsip;
+package com.example.ngnsip;
 
 import org.doubango.ngn.events.NgnEventArgs;
 import org.doubango.ngn.events.NgnRegistrationEventArgs;
