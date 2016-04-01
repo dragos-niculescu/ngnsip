@@ -2,11 +2,13 @@ package com.example.ngnsip;
 
 import org.doubango.ngn.NgnEngine;
 import org.doubango.ngn.events.NgnInviteEventArgs;
+import org.doubango.ngn.events.NgnMessagingEventArgs;
 import org.doubango.ngn.events.NgnRegistrationEventArgs;
 import org.doubango.ngn.media.NgnMediaType;
 import org.doubango.ngn.services.INgnConfigurationService;
 import org.doubango.ngn.services.INgnSipService;
 import org.doubango.ngn.sip.NgnAVSession;
+import org.doubango.ngn.sip.NgnMessagingSession;
 import org.doubango.ngn.utils.NgnConfigurationEntry;
 import org.doubango.ngn.utils.NgnUriUtils;
 
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -25,18 +28,19 @@ public class MainActivity extends Activity {
 	private INgnSipService mSipService;
 	private RegistrationBroadcastReceiver regBroadcastReceiver;
 	private CallStateReceiver callStateReceiver;
-
+	private TextReceiver textReceiver;
+	private NgnAVSession mSession = null; 
+	String destinationAddr = "";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	
-		Log.i("DEBUG", "here0");
 		 
 	mEngine = NgnEngine.getInstance();
 	if(mEngine == null)
 		Log.i("DEBUG", "mEngine null" );
-	Log.i("DEBUG", "here");
+	
 	mSipService = mEngine.getSipService();
 	  
 	  
@@ -54,6 +58,10 @@ public class MainActivity extends Activity {
 	  intentRFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
 	  registerReceiver(callStateReceiver, intentRFilter);
 	
+	  final IntentFilter intentRFiltert = new IntentFilter();
+	  textReceiver = new TextReceiver();
+	  intentRFiltert.addAction(NgnMessagingEventArgs.ACTION_MESSAGING_EVENT);
+	  registerReceiver(textReceiver, intentRFiltert);
 
 	
 		
@@ -63,8 +71,6 @@ public class MainActivity extends Activity {
 	          public void onClick(View view) {
 	        	  configure_stack(); 
 	        	  initializeManager();
-	        	  Log.i("DEBUG", "here2");
-	        	  Toast.makeText(MainActivity.this, "You have clicked!", Toast.LENGTH_SHORT).show();
 	          }
 	        });
 		
@@ -80,15 +86,53 @@ public class MainActivity extends Activity {
 			      return;
 			    }
 			    
-			    NgnAVSession avSession = NgnAVSession.createOutgoingSession(
+			     mSession = NgnAVSession.createOutgoingSession(
 			      NgnEngine.getInstance().getSipService().getSipStack(), NgnMediaType.Audio);
-			    if(avSession.makeCall(validUri)){ 
+			    if(mSession.makeCall(validUri)){ 
 			    	Log.d("DEBUG", "Call OK");
 			    } else {
 			    	Log.d("DEBUG", "Call failed");
 			    }
 	          }
 		 });
+		
+		Button BtHangUp = (Button)findViewById(R.id.button_hangup);
+        
+        BtHangUp.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(mSession != null){
+					mSession.hangUpCall();
+					Log.d("DEBUG", "Hangup");
+				}
+			}
+		});
+
+        	
+		Button BtSendTxt = (Button)findViewById(R.id.button_sendtxt);
+        BtSendTxt.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(mSession != null){
+					final String textToSend = "hello ";
+					EditText text2send = (EditText)findViewById(R.id.editText_destination);
+					final String remotePartyUri = "sip:" + text2send.getText().toString();
+					//"sip:+336000000@doubango.org"; // remote party
+					final NgnMessagingSession imSession =
+							NgnMessagingSession.createOutgoingSession(mSipService.getSipStack(),
+									remotePartyUri);
+					if(!imSession.sendTextMessage(textToSend)){
+						Log.e("DEBUG","Failed to send");
+					}
+					else{
+						Log.d("DEBUG","Message sent");
+					}
+        // release session
+					NgnMessagingSession.releaseSession(imSession);
+				}
+			}
+		});
+        
 				    
 	}
 

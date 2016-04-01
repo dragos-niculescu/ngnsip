@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 public class RegistrationBroadcastReceiver extends BroadcastReceiver {
 
@@ -24,12 +25,14 @@ public class RegistrationBroadcastReceiver extends BroadcastReceiver {
 	      }
 	      switch(args.getEventType()){
 	        case REGISTRATION_NOK:
+	        	Toast.makeText(context, "Failed to register", Toast.LENGTH_SHORT).show();
 	          Log.d("DEBUG", "Failed to register :(");
 	          break;
 	        case UNREGISTRATION_OK:
 	          Log.d("DEBUG", "You are now unregistered :(");
 	          break;
 	        case REGISTRATION_OK:
+	        	Toast.makeText(context, "Registered :-)", Toast.LENGTH_SHORT).show();
 	          Log.d("DEBUG", "You are now registered :)");
 	          break;
 	        case REGISTRATION_INPROGRESS:

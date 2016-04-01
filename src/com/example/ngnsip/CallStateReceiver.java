@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 public class CallStateReceiver extends BroadcastReceiver {
 
@@ -48,6 +49,7 @@ public class CallStateReceiver extends BroadcastReceiver {
 	          break;
 	        case INCALL:
 	          Log.i("DEBUG", "Call connected");
+	          Toast.makeText(context, "Call connected", Toast.LENGTH_SHORT).show();
 	          mEngine.getSoundService().stopRingTone();
 	          break;
 	        case TERMINATED:
