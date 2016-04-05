@@ -26,6 +26,9 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	private NgnEngine mEngine;
 	private INgnSipService mSipService;
+	private IntentFilter regIntentFilter; 
+	private IntentFilter callIntentFilter;
+	private IntentFilter textIntentFilter;
 	private RegistrationBroadcastReceiver regBroadcastReceiver;
 	private CallStateReceiver callStateReceiver;
 	private TextReceiver textReceiver;
@@ -48,20 +51,20 @@ public class MainActivity extends Activity {
 	 
 	  
 	  regBroadcastReceiver = new RegistrationBroadcastReceiver();
-	  final IntentFilter intentFilter = new IntentFilter();
-	  intentFilter.addAction(NgnRegistrationEventArgs.ACTION_REGISTRATION_EVENT);
-	  registerReceiver(regBroadcastReceiver, intentFilter);
+	  regIntentFilter = new IntentFilter();
+	  regIntentFilter.addAction(NgnRegistrationEventArgs.ACTION_REGISTRATION_EVENT);
+	  registerReceiver(regBroadcastReceiver, regIntentFilter);
 	  // Incoming call broadcast receiver
 
-	  final IntentFilter intentRFilter = new IntentFilter();
+	  callIntentFilter = new IntentFilter();
 	  callStateReceiver = new CallStateReceiver();
-	  intentRFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
-	  registerReceiver(callStateReceiver, intentRFilter);
+	  callIntentFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
+	  registerReceiver(callStateReceiver, callIntentFilter);
 	
-	  final IntentFilter intentRFiltert = new IntentFilter();
+	  textIntentFilter = new IntentFilter();
 	  textReceiver = new TextReceiver();
-	  intentRFiltert.addAction(NgnMessagingEventArgs.ACTION_MESSAGING_EVENT);
-	  registerReceiver(textReceiver, intentRFiltert);
+	  textIntentFilter.addAction(NgnMessagingEventArgs.ACTION_MESSAGING_EVENT);
+	  registerReceiver(textReceiver, textIntentFilter);
 
 	
 		
@@ -180,6 +183,24 @@ public void initializeManager() {
 		  }
 	}
 	
+@Override
+protected void onResume() {
+  super.onResume();
+  registerReceiver(regBroadcastReceiver, regIntentFilter);
+  registerReceiver(callStateReceiver, callIntentFilter);
+  registerReceiver(textReceiver, textIntentFilter);
+}
+ 
+@Override
+protected void onPause() {
+	Log.i("DEBUG", "OnPause");
+	unregisterReceiver(regBroadcastReceiver);
+	unregisterReceiver(callStateReceiver);
+	unregisterReceiver(textReceiver);
+  super.onPause();
+}
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
