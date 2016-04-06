@@ -10,6 +10,7 @@ import org.doubango.ngn.services.INgnSipService;
 import org.doubango.ngn.sip.NgnAVSession;
 import org.doubango.ngn.sip.NgnMessagingSession;
 import org.doubango.ngn.utils.NgnConfigurationEntry;
+import org.doubango.ngn.utils.NgnStringUtils;
 import org.doubango.ngn.utils.NgnUriUtils;
 
 import android.app.Activity;
@@ -21,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private NgnEngine mEngine;
@@ -77,13 +77,21 @@ public class MainActivity extends Activity {
 	          }
 	        });
 		
+		Button buttonUnreg = (Button)findViewById(R.id.button_unregister );
+		buttonUnreg.setOnClickListener(new Button.OnClickListener(){	
+	          @Override
+	          public void onClick(View view) {
+	        	  mSipService.unRegister();
+	          }
+	        });
+		
 		Button buttoncall = (Button)findViewById(R.id.button_call );
 		buttoncall.setOnClickListener(new Button.OnClickListener(){	
 	          @Override
 	          public void onClick(View view) {
-		
-		  final String validUri = NgnUriUtils.makeValidSipUri(
-			      String.format("sip:%s@%s", "echo", "conference.sip2sip.info"));
+		EditText sipaddr = (EditText)findViewById(R.id.editText_destination );
+		  final String validUri = NgnUriUtils.makeValidSipUri("sip:" + sipaddr.getText().toString());
+			      //String.format("sip:%s@%s", "echo", "conference.sip2sip.info"));
 			    if(validUri == null){
 			      Log.e("DEBUG", "Invalid number");
 			      return;
@@ -132,6 +140,30 @@ public class MainActivity extends Activity {
 					}
         // release session
 					NgnMessagingSession.releaseSession(imSession);
+				}
+			}
+		});
+        
+        Button BtSendDTMF = (Button)findViewById(R.id.button_send_dtmf );
+        BtSendDTMF.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(mSession != null){
+					final String textToSend = "#";
+					int char2send = ((EditText)findViewById(R.id.editText_dtmf)).getText().toString().charAt(0);
+					
+					if(char2send >= '0' && char2send <= '9')
+						char2send -= '0';
+					if(char2send == '#')
+						char2send = 11;
+					if(char2send == '*')
+						char2send = 10;
+					if(!mSession.sendDTMF( char2send )){
+						Log.e("DEBUG","Failed to send DTMF " + char2send);
+					}
+					else{
+						Log.d("DEBUG", char2send + ": DTMF sent");
+					}
 				}
 			}
 		});
@@ -186,20 +218,40 @@ public void initializeManager() {
 @Override
 protected void onResume() {
   super.onResume();
-  registerReceiver(regBroadcastReceiver, regIntentFilter);
-  registerReceiver(callStateReceiver, callIntentFilter);
-  registerReceiver(textReceiver, textIntentFilter);
+//  registerReceiver(regBroadcastReceiver, regIntentFilter);
+//  registerReceiver(callStateReceiver, callIntentFilter);
+//  registerReceiver(textReceiver, textIntentFilter);
 }
  
 @Override
 protected void onPause() {
 	Log.i("DEBUG", "OnPause");
-	unregisterReceiver(regBroadcastReceiver);
-	unregisterReceiver(callStateReceiver);
-	unregisterReceiver(textReceiver);
+//	unregisterReceiver(regBroadcastReceiver);
+//	unregisterReceiver(callStateReceiver);
+//	unregisterReceiver(textReceiver);
   super.onPause();
 }
 
+@Override
+protected void onDestroy() {
+	Log.i("DEBUG", "OnDestroy");
+	 if(mEngine.isStarted()){
+         mEngine.stop();
+     }
+	 if(regBroadcastReceiver != null){
+		 unregisterReceiver(regBroadcastReceiver);
+		 regBroadcastReceiver = null;
+	 }
+	 if(callStateReceiver != null){
+		 unregisterReceiver(callStateReceiver);
+		 callStateReceiver = null;
+	 }
+	 if(textReceiver != null){
+		 unregisterReceiver(textReceiver);
+		 textReceiver = null; 
+	 }
+  super.onDestroy();
+}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
