@@ -11,14 +11,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.webkit.WebView.FindListener;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class TextReceiver extends BroadcastReceiver {
 
-	
+	MainActivity mActivity; 
+	public TextReceiver (MainActivity a){ 
+		mActivity = a; 
+	}
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
@@ -44,7 +45,15 @@ public class TextReceiver extends BroadcastReceiver {
 	 						if(contentBytes != null && contentBytes.length > 0){
 	 							try {
 									String contentStr = new String(contentBytes, "UTF-8");
-									
+									TextView chat = (TextView)mActivity.findViewById(R.id.textView_chat);
+									String chat_str = chat.getText().toString();
+									chat.setText(chat_str + "\nThem: " + contentStr);	
+									final int scrollAmount = chat.getLayout().getLineTop(chat.getLineCount()) - chat.getHeight();
+								    // if there is no need to scroll, scrollAmount will be <=0
+								    if (scrollAmount > 0)
+								        chat.scrollTo(0, scrollAmount);
+								    else
+								        chat.scrollTo(0, 0);
 									Toast.makeText(context, contentStr, Toast.LENGTH_LONG).show();
 									
 								} catch (UnsupportedEncodingException e) {

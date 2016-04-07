@@ -14,6 +14,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView_chat"
         android:layout_below="@+id/editText_destination"
+        android:maxLines="15"
+        android:scrollbars="vertical"
         android:layout_marginTop="26dp" >
 
         <Button
@@ -72,6 +74,7 @@
         android:text="Unregistered" />
 
     <TextView
+        android:windowSoftInputMode="adjustResize"
         android:id="@+id/textView_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -92,6 +95,7 @@
         android:text="Unregister" />
 
     <EditText
+        android:windowSoftInputMode="adjustResize"
         android:id="@+id/editText_chatline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

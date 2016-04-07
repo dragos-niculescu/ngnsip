@@ -15,12 +15,11 @@ import org.doubango.ngn.utils.NgnUriUtils;
 import android.app.Activity;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -64,11 +63,12 @@ public class MainActivity extends Activity {
 	  registerReceiver(callStateReceiver, callIntentFilter);
 	
 	  textIntentFilter = new IntentFilter();
-	  textReceiver = new TextReceiver();
+	  textReceiver = new TextReceiver(this);
 	  textIntentFilter.addAction(NgnMessagingEventArgs.ACTION_MESSAGING_EVENT);
 	  registerReceiver(textReceiver, textIntentFilter);
 
-	
+	  TextView chat = (TextView)findViewById(R.id.textView_chat);
+	  chat.setMovementMethod(new ScrollingMovementMethod());
 		
 		Button button = (Button)findViewById(R.id.button_register );
 		button.setOnClickListener(new Button.OnClickListener(){	
@@ -168,13 +168,20 @@ public class MainActivity extends Activity {
 									remotePartyUri);
 					if(!imSession.sendTextMessage(textToSend.getText().toString() )){
 						Log.e("DEBUG","Failed to send");
-					}
+					} 
 					else{
 						Log.d("DEBUG","Message sent");
 						
 						TextView chat = (TextView)findViewById(R.id.textView_chat);
+						
 						String chat_str = chat.getText().toString();
-						chat.setText(chat_str + "\n" + textToSend.getText().toString());
+						chat.setText(chat_str + "\nMe: " + textToSend.getText().toString());
+						final int scrollAmount = chat.getLayout().getLineTop(chat.getLineCount()) - chat.getHeight();
+					    // if there is no need to scroll, scrollAmount will be <=0
+					    if (scrollAmount > 0)
+					        chat.scrollTo(0, scrollAmount);
+					    else
+					        chat.scrollTo(0, 0);
 						textToSend.setText("");
 					}
         // release session
@@ -216,17 +223,17 @@ public class MainActivity extends Activity {
 		NgnEngine mEngine = NgnEngine.getInstance();
 		INgnConfigurationService mConfigurationService
 		            = mEngine.getConfigurationService();
-		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_IMPI, "getonsip_eim");
+		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_IMPI, Constants.IDENTITY_IMPI);
 		                                   // "sip_username");
-		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_IMPU, String.format("sip:%s@%s", "eim", "getonsip.com")); 
+		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_IMPU, String.format("sip:%s@%s", Constants.USERNAME, Constants.DOMAIN)); 
 		        //String.format("sip:%s@%s", "sip_username", "sip_domain"));
-		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_PASSWORD, "gEyBBh7vn6svrGWD");
+		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_PASSWORD, Constants.IDENTITY_PASSWORD);
 		                                   // "sip_password");
-		mConfigurationService.putString(NgnConfigurationEntry.NETWORK_PCSCF_HOST, "sip.onsip.com"); 
+		mConfigurationService.putString(NgnConfigurationEntry.NETWORK_PCSCF_HOST, Constants.NETWORK_PCSCF_HOST); 
 		                                    //"sip_server_host");
-		mConfigurationService.putInt(NgnConfigurationEntry.NETWORK_PCSCF_PORT, 5060);
+		mConfigurationService.putInt(NgnConfigurationEntry.NETWORK_PCSCF_PORT, Constants.NETWORK_PCSCF_PORT);
 		                                    //"sip_server_port");
-		mConfigurationService.putString(NgnConfigurationEntry.NETWORK_REALM, "getonsip.com");
+		mConfigurationService.putString(NgnConfigurationEntry.NETWORK_REALM, Constants.NETWORK_REALM);
 		                                    //"sip_domain");
 		// By default, using 3G for calls disabled
 

@@ -43,7 +43,7 @@ public class RegistrationBroadcastReceiver extends BroadcastReceiver {
 	        	break;
 	        case REGISTRATION_OK:
 	        	status = (TextView)mActivity.findViewById(R.id.textview_reg );
-	        	status.setText(Constants.IDENTITY_IMPU);
+	        	status.setText(Constants.USERNAME + "@" + Constants.DOMAIN);
 	        	
 	          Log.d("DEBUG", "You are now registered :)");
 	          break;
