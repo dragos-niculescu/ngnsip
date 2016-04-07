@@ -10,18 +10,20 @@ import org.doubango.ngn.services.INgnSipService;
 import org.doubango.ngn.sip.NgnAVSession;
 import org.doubango.ngn.sip.NgnMessagingSession;
 import org.doubango.ngn.utils.NgnConfigurationEntry;
-import org.doubango.ngn.utils.NgnStringUtils;
 import org.doubango.ngn.utils.NgnUriUtils;
 
 import android.app.Activity;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	private NgnEngine mEngine;
@@ -50,7 +52,7 @@ public class MainActivity extends Activity {
 	  // Register broadcast receivers
 	 
 	  
-	  regBroadcastReceiver = new RegistrationBroadcastReceiver();
+	  regBroadcastReceiver = new RegistrationBroadcastReceiver(this);
 	  regIntentFilter = new IntentFilter();
 	  regIntentFilter.addAction(NgnRegistrationEventArgs.ACTION_REGISTRATION_EVENT);
 	  registerReceiver(regBroadcastReceiver, regIntentFilter);
@@ -118,25 +120,62 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
+/*
+        EditText chat_txt = (EditText) findViewById(R.id.editText_chatline );
 
-        	
+        chat_txt.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            		Log.d("DEBUG","EEditor action " + actionId + " " + event.getKeyCode());
+                	//if (actionId == EditorInfo.IME_ACTION_DONE) {
+            		if(event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN){
+                		if(mSession != null){
+                			final String textToSend = "hello ";
+                			EditText text2send = (EditText)findViewById(R.id.editText_destination);
+                			final String remotePartyUri = "sip:" + text2send.getText().toString();
+    					//"sip:+336000000@doubango.org"; // remote party
+                			final NgnMessagingSession imSession =
+    							NgnMessagingSession.createOutgoingSession(mSipService.getSipStack(),
+    									remotePartyUri);
+                			if(!imSession.sendTextMessage(textToSend)){
+                				Log.e("DEBUG","Failed to send");
+                			}
+                			else{
+                				Log.d("DEBUG","Message sent");
+                			}
+            // release session
+                			NgnMessagingSession.releaseSession(imSession);
+    				}
+                	
+                    return true;
+                }
+                return false;
+            }
+        });	
+*/
+        
 		Button BtSendTxt = (Button)findViewById(R.id.button_sendtxt);
         BtSendTxt.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(mSession != null){
-					final String textToSend = "hello ";
-					EditText text2send = (EditText)findViewById(R.id.editText_destination);
-					final String remotePartyUri = "sip:" + text2send.getText().toString();
-					//"sip:+336000000@doubango.org"; // remote party
+					EditText textToSend = (EditText)findViewById(R.id.editText_chatline );
+					EditText dest = (EditText)findViewById(R.id.editText_destination);
+					final String remotePartyUri = "sip:" + dest.getText().toString();
+					// remote party
 					final NgnMessagingSession imSession =
 							NgnMessagingSession.createOutgoingSession(mSipService.getSipStack(),
 									remotePartyUri);
-					if(!imSession.sendTextMessage(textToSend)){
+					if(!imSession.sendTextMessage(textToSend.getText().toString() )){
 						Log.e("DEBUG","Failed to send");
 					}
 					else{
 						Log.d("DEBUG","Message sent");
+						
+						TextView chat = (TextView)findViewById(R.id.textView_chat);
+						String chat_str = chat.getText().toString();
+						chat.setText(chat_str + "\n" + textToSend.getText().toString());
+						textToSend.setText("");
 					}
         // release session
 					NgnMessagingSession.releaseSession(imSession);

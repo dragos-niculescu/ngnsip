@@ -7,16 +7,24 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RegistrationBroadcastReceiver extends BroadcastReceiver {
 
+	private MainActivity mActivity; 
+	
+	public RegistrationBroadcastReceiver(MainActivity m)
+	{
+		mActivity = m;
+	}
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
 		final String action = intent.getAction();
 	    // Registration Event
-
+		TextView status; 
+		
 	    if(NgnRegistrationEventArgs.ACTION_REGISTRATION_EVENT.equals(action)){
 	      NgnRegistrationEventArgs args = intent.getParcelableExtra(NgnEventArgs.EXTRA_EMBEDDED);
 	      if(args == null){
@@ -29,10 +37,14 @@ public class RegistrationBroadcastReceiver extends BroadcastReceiver {
 	          Log.d("DEBUG", "Failed to register :(");
 	          break;
 	        case UNREGISTRATION_OK:
-	          Log.d("DEBUG", "You are now unregistered :(");
-	          break;
+	        	status = (TextView)mActivity.findViewById(R.id.textview_reg );
+	        	status.setText("Unregistered");
+	        	Log.d("DEBUG", "You are now unregistered :(");
+	        	break;
 	        case REGISTRATION_OK:
-	        	Toast.makeText(context, "Registered :-)", Toast.LENGTH_SHORT).show();
+	        	status = (TextView)mActivity.findViewById(R.id.textview_reg );
+	        	status.setText(Constants.IDENTITY_IMPU);
+	        	
 	          Log.d("DEBUG", "You are now registered :)");
 	          break;
 	        case REGISTRATION_INPROGRESS:

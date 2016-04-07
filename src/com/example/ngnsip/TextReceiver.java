@@ -44,7 +44,9 @@ public class TextReceiver extends BroadcastReceiver {
 	 						if(contentBytes != null && contentBytes.length > 0){
 	 							try {
 									String contentStr = new String(contentBytes, "UTF-8");
+									
 									Toast.makeText(context, contentStr, Toast.LENGTH_LONG).show();
+									
 								} catch (UnsupportedEncodingException e) {
 									Log.i("DEBUG", e.toString());
 								}

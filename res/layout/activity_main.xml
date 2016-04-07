@@ -8,101 +8,115 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.ngnsip.MainActivity" >
 
-    <TextView
-        android:id="@+id/textView1"
+    <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button_register"
-        android:layout_alignParentRight="true"
-        android:text="Destination:" />
+        android:layout_alignLeft="@+id/textView_chat"
+        android:layout_below="@+id/editText_destination"
+        android:layout_marginTop="26dp" >
 
-    <Button
-        android:id="@+id/button_call"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button_register"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/button_register"
-        android:layout_marginBottom="22dp"
-        android:text="Call" />
+        <Button
+            android:id="@+id/button_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Call" />
 
-    <Button
-        android:id="@+id/button_register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button_call"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="30dp"
-        android:text="Register" />
+        <Button
+            android:id="@+id/button_hangup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/button_call"
+            android:layout_below="@+id/button_call"
+            android:text="HangUp" />
 
-    <Button
-        android:id="@+id/button_hangup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button_register"
-        android:layout_toRightOf="@+id/button_register"
-        android:text="HangUp" />
+        <Button
+            android:id="@+id/button_send_dtmf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DTMF" />
 
-    <Button
-        android:id="@+id/button_sendtxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_hangup"
-        android:layout_alignBottom="@+id/button_hangup"
-        android:layout_alignRight="@+id/textView1"
-        android:text="SendTxt" />
+        <EditText
+            android:id="@+id/editText_dtmf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:ems="10"
+            android:text="09#" >
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/editText_destination"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_alignRight="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="14dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/button_register"
+        android:layout_marginTop="41dp"
         android:ems="10"
-        android:text="thetestcall@getonsip.com" >
+        android:minLines="1"
+        android:singleLine="true"
+        android:text="thetestcall@getonsip.com" />
 
-        <requestFocus />
-    </EditText>
+    <TextView
+        android:id="@+id/textview_reg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/button_register"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/button_unregister"
+        android:layout_toRightOf="@+id/button_unregister"
+        android:text="Unregistered" />
 
     <TextView
         android:id="@+id/textView_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/editText_destination"
+        android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/editText_destination"
-        android:layout_below="@+id/editText_destination"
-        android:text="TextView" />
-
-    <Button
-        android:id="@+id/button_send_dtmf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/button_register"
-        android:layout_alignLeft="@+id/button_hangup"
-        android:layout_alignRight="@+id/button_hangup"
-        android:text="DTMF" />
-
-    <EditText
-        android:id="@+id/editText_dtmf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_send_dtmf"
-        android:layout_alignBottom="@+id/button_send_dtmf"
-        android:layout_toRightOf="@+id/button_send_dtmf"
-        android:ems="10"
-        android:text="0-9#*" />
+        android:layout_below="@+id/editText_chatline"
+        android:text="Chat" />
 
     <Button
         android:id="@+id/button_unregister"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_call"
-        android:layout_alignLeft="@+id/button_call"
-        android:layout_alignRight="@+id/button_register"
-        android:layout_below="@+id/button_send_dtmf"
+        
+        android:layout_alignBottom="@+id/button_register"
+        android:layout_toRightOf="@+id/button_register"
         android:text="Unregister" />
+
+    <EditText
+        android:id="@+id/editText_chatline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/linearLayout1"
+        android:layout_centerVertical="true"
+        android:ems="10"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:minLines="1"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/button_sendtxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editText_chatline"
+        android:layout_alignRight="@+id/linearLayout1"
+        android:text="Send" />
+
+    <Button
+        android:id="@+id/button_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText_destination"
+        android:layout_alignParentTop="true"
+        android:text="Register" />
 
 </RelativeLayout>
