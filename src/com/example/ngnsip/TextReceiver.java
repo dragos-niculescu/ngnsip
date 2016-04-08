@@ -47,7 +47,7 @@ public class TextReceiver extends BroadcastReceiver {
 							String contentStr = new String(contentBytes, "UTF-8");
 							TextView chat = (TextView)mActivity.findViewById(R.id.textView_chat);
 							String chat_str = chat.getText().toString();
-							chat.setText(chat_str + "\nThem: " + contentStr);	
+							chat.setText(chat_str + MainActivity.instance.mSession.getRemotePartyDisplayName() + ": " + contentStr + "\n");	
 							// Toast.makeText(context, contentStr, Toast.LENGTH_LONG).show();
 
 						} catch (UnsupportedEncodingException e) {

@@ -48,7 +48,7 @@ public class ChatActivity extends Activity {
 				if(MainActivity.instance.mSipService != null){
 					EditText textToSend = (EditText)findViewById(R.id.editText_chatline );
 					//EditText dest = (EditText)findViewById(R.id.editText_destination);
-					final String remotePartyUri = "sip:" + sipaddr;
+					final String remotePartyUri = sipaddr;
 					// remote party
 					final NgnMessagingSession imSession =
 							NgnMessagingSession.createOutgoingSession(MainActivity.instance.mSipService.getSipStack(),
@@ -57,12 +57,9 @@ public class ChatActivity extends Activity {
 						Log.e("DEBUG","Failed to send");
 					} 
 					else{
-
-
 						TextView chat = (TextView)findViewById(R.id.textView_chat);
-
 						String chat_str = chat.getText().toString();
-						chat.setText(chat_str + "\nMe: " + textToSend.getText().toString());
+						chat.setText(chat_str + "Me: " + textToSend.getText().toString() + "\n");
 						textToSend.setText("");
 						Log.d("DEBUG","Message sent"); 
 					}

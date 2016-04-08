@@ -2,13 +2,11 @@ package com.example.ngnsip;
 
 import org.doubango.ngn.NgnEngine;
 import org.doubango.ngn.events.NgnInviteEventArgs;
-import org.doubango.ngn.events.NgnMessagingEventArgs;
 import org.doubango.ngn.events.NgnRegistrationEventArgs;
 import org.doubango.ngn.media.NgnMediaType;
 import org.doubango.ngn.services.INgnConfigurationService;
 import org.doubango.ngn.services.INgnSipService;
 import org.doubango.ngn.sip.NgnAVSession;
-import org.doubango.ngn.sip.NgnMessagingSession;
 import org.doubango.ngn.utils.NgnConfigurationEntry;
 import org.doubango.ngn.utils.NgnUriUtils;
 
@@ -16,7 +14,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private NgnEngine mEngine = null;
@@ -33,7 +29,7 @@ public class MainActivity extends Activity {
 	private IntentFilter callIntentFilter;
 	private RegistrationBroadcastReceiver regBroadcastReceiver;
 	private CallStateReceiver callStateReceiver;
-	private NgnAVSession mSession = null; 
+	public NgnAVSession mSession = null; 
 	String destinationAddr = "";
 
 	public static MainActivity instance;
@@ -65,7 +61,7 @@ public class MainActivity extends Activity {
 		// Incoming call broadcast receiver
 
 		callIntentFilter = new IntentFilter();
-		callStateReceiver = new CallStateReceiver();
+		callStateReceiver = new CallStateReceiver(this);
 		callIntentFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
 		registerReceiver(callStateReceiver, callIntentFilter);
 
@@ -104,16 +100,21 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				EditText sipaddr = (EditText)findViewById(R.id.editText_destination );
-				final String validUri = NgnUriUtils.makeValidSipUri("sip:" + sipaddr.getText().toString());
+				final String validUri = NgnUriUtils.makeValidSipUri(sipaddr.getText().toString());
 				//String.format("sip:%s@%s", "echo", "conference.sip2sip.info"));
 				if(validUri == null){
 					Log.e("DEBUG", "Invalid number");
 					return;
 				}
-
+				if(!mEngine.isStarted() || !mSipService.isRegistered()){
+					Log.e("DEBUG", "not registered");
+					return;
+				}
 				mSession = NgnAVSession.createOutgoingSession(
 						NgnEngine.getInstance().getSipService().getSipStack(), NgnMediaType.Audio);
-				if(mSession.makeCall(validUri)){ 
+				if(mSession.makeCall(validUri)){
+					TextView status = (TextView)findViewById(R.id.textView_callstatus);
+					status.setText("Calling...");
 					Log.d("DEBUG", "Call OK");
 				} else {
 					Log.d("DEBUG", "Call failed");

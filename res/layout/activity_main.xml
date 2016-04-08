@@ -32,7 +32,7 @@
         android:ems="10"
         android:minLines="1"
         android:singleLine="true"
-        android:text="thetestcall@getonsip.com" />
+        android:text="sip:thetestcall@getonsip.com" />
 
     <TextView
         android:id="@+id/textview_reg"
@@ -101,5 +101,15 @@
         android:layout_alignLeft="@+id/button_startchat"
         android:ems="10"
         android:text="09#" />
+
+    <TextView
+        android:id="@+id/textView_callstatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/linearLayout1"
+        android:layout_alignRight="@+id/button_unregister"
+        android:layout_below="@+id/button_call"
+        android:text="no call"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
