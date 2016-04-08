@@ -35,95 +35,95 @@ public class MainActivity extends Activity {
 	private CallStateReceiver callStateReceiver;
 	private NgnAVSession mSession = null; 
 	String destinationAddr = "";
-	
+
 	public static MainActivity instance;
 	public MainActivity getInstance(){
-	    return instance;
+		return instance;
 	}
 
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		instance = this;
-		
-	mEngine = NgnEngine.getInstance();
-	if(mEngine == null)
-		Log.i("DEBUG", "mEngine null" );
-	
-	mSipService = mEngine.getSipService();
-	  
-	  
-	  // Register broadcast receivers
-	 
-	  
-	  regBroadcastReceiver = new RegistrationBroadcastReceiver(this);
-	  regIntentFilter = new IntentFilter();
-	  regIntentFilter.addAction(NgnRegistrationEventArgs.ACTION_REGISTRATION_EVENT);
-	  registerReceiver(regBroadcastReceiver, regIntentFilter);
-	  // Incoming call broadcast receiver
 
-	  callIntentFilter = new IntentFilter();
-	  callStateReceiver = new CallStateReceiver();
-	  callIntentFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
-	  registerReceiver(callStateReceiver, callIntentFilter);
-	
-	  		
-	  Button buttonchat = (Button)findViewById(R.id.button_startchat );
+		mEngine = NgnEngine.getInstance();
+		if(mEngine == null)
+			Log.i("DEBUG", "mEngine null" );
+
+		mSipService = mEngine.getSipService();
+
+
+		// Register broadcast receivers
+
+
+		regBroadcastReceiver = new RegistrationBroadcastReceiver(this);
+		regIntentFilter = new IntentFilter();
+		regIntentFilter.addAction(NgnRegistrationEventArgs.ACTION_REGISTRATION_EVENT);
+		registerReceiver(regBroadcastReceiver, regIntentFilter);
+		// Incoming call broadcast receiver
+
+		callIntentFilter = new IntentFilter();
+		callStateReceiver = new CallStateReceiver();
+		callIntentFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
+		registerReceiver(callStateReceiver, callIntentFilter);
+
+
+		Button buttonchat = (Button)findViewById(R.id.button_startchat );
 		buttonchat.setOnClickListener(new Button.OnClickListener(){	
-	          @Override 
-	          public void onClick(View view) { 	        	  
-	        	  Intent intent = new Intent (getApplicationContext() , ChatActivity.class);
-	        	  EditText dest = (EditText)findViewById(R.id.editText_destination);
-	        	  intent.putExtra("SIPADDR", dest.getText().toString());
-	        	  startActivity(intent);
-	          }
-	        });
-		 
-	  
+			@Override 
+			public void onClick(View view) { 	        	  
+				Intent intent = new Intent (getApplicationContext() , ChatActivity.class);
+				EditText dest = (EditText)findViewById(R.id.editText_destination);
+				intent.putExtra("SIPADDR", dest.getText().toString());
+				startActivity(intent);
+			}
+		});
+
+
 		Button button = (Button)findViewById(R.id.button_register );
 		button.setOnClickListener(new Button.OnClickListener(){	
-	          @Override
-	          public void onClick(View view) {
-	        	  configure_stack(); 
-	        	  initializeManager();
-	          }
-	        });
-		
+			@Override
+			public void onClick(View view) {
+				configure_stack(); 
+				initializeManager();
+			}
+		});
+
 		Button buttonUnreg = (Button)findViewById(R.id.button_unregister );
 		buttonUnreg.setOnClickListener(new Button.OnClickListener(){	
-	          @Override
-	          public void onClick(View view) {
-	        	  mSipService.unRegister();
-	          }
-	        });
-		
+			@Override
+			public void onClick(View view) {
+				mSipService.unRegister();
+			}
+		});
+
 		Button buttoncall = (Button)findViewById(R.id.button_call );
 		buttoncall.setOnClickListener(new Button.OnClickListener(){	
-	          @Override
-	          public void onClick(View view) {
-	        	  EditText sipaddr = (EditText)findViewById(R.id.editText_destination );
-	        	  final String validUri = NgnUriUtils.makeValidSipUri("sip:" + sipaddr.getText().toString());
-			      //String.format("sip:%s@%s", "echo", "conference.sip2sip.info"));
-	        	  if(validUri == null){
-	        		  Log.e("DEBUG", "Invalid number");
-	        		  return;
-	        	  }
-			    
-	        	  mSession = NgnAVSession.createOutgoingSession(
-	        			  NgnEngine.getInstance().getSipService().getSipStack(), NgnMediaType.Audio);
-	        	  if(mSession.makeCall(validUri)){ 
-			    	Log.d("DEBUG", "Call OK");
-	        	  } else {
-	        		  Log.d("DEBUG", "Call failed");
-	        	  }
-	          	}
-		 	});
-		
+			@Override
+			public void onClick(View view) {
+				EditText sipaddr = (EditText)findViewById(R.id.editText_destination );
+				final String validUri = NgnUriUtils.makeValidSipUri("sip:" + sipaddr.getText().toString());
+				//String.format("sip:%s@%s", "echo", "conference.sip2sip.info"));
+				if(validUri == null){
+					Log.e("DEBUG", "Invalid number");
+					return;
+				}
+
+				mSession = NgnAVSession.createOutgoingSession(
+						NgnEngine.getInstance().getSipService().getSipStack(), NgnMediaType.Audio);
+				if(mSession.makeCall(validUri)){ 
+					Log.d("DEBUG", "Call OK");
+				} else {
+					Log.d("DEBUG", "Call failed");
+				}
+			}
+		});
+
 		Button BtHangUp = (Button)findViewById(R.id.button_hangup);
-        
-        BtHangUp.setOnClickListener(new View.OnClickListener() {
+
+		BtHangUp.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(mSession != null){
@@ -132,49 +132,16 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-/*
-        EditText chat_txt = (EditText) findViewById(R.id.editText_chatline );
 
-        chat_txt.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-            		Log.d("DEBUG","EEditor action " + actionId + " " + event.getKeyCode());
-                	//if (actionId == EditorInfo.IME_ACTION_DONE) {
-            		if(event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN){
-                		if(mSession != null){
-                			final String textToSend = "hello ";
-                			EditText text2send = (EditText)findViewById(R.id.editText_destination);
-                			final String remotePartyUri = "sip:" + text2send.getText().toString();
-    					//"sip:+336000000@doubango.org"; // remote party
-                			final NgnMessagingSession imSession =
-    							NgnMessagingSession.createOutgoingSession(mSipService.getSipStack(),
-    									remotePartyUri);
-                			if(!imSession.sendTextMessage(textToSend)){
-                				Log.e("DEBUG","Failed to send");
-                			}
-                			else{
-                				Log.d("DEBUG","Message sent");
-                			}
-            // release session
-                			NgnMessagingSession.releaseSession(imSession);
-    				}
-                	
-                    return true;
-                }
-                return false;
-            }
-        });	
-*/
-        
-	    
-        Button BtSendDTMF = (Button)findViewById(R.id.button_send_dtmf );
-        BtSendDTMF.setOnClickListener(new View.OnClickListener() {
+
+		Button BtSendDTMF = (Button)findViewById(R.id.button_send_dtmf );
+		BtSendDTMF.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if(mSession != null){
 					final String textToSend = "#";
 					int char2send = ((EditText)findViewById(R.id.editText_dtmf)).getText().toString().charAt(0);
-					
+
 					if(char2send >= '0' && char2send <= '9')
 						char2send -= '0';
 					if(char2send == '#')
@@ -190,88 +157,88 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-        
-				    
+
+
 	}
 
-	
+
 	public void configure_stack()
 	{
 		NgnEngine mEngine = NgnEngine.getInstance();
 		INgnConfigurationService mConfigurationService
-		            = mEngine.getConfigurationService();
+		= mEngine.getConfigurationService();
 		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_IMPI, Constants.IDENTITY_IMPI);
-		                                   // "sip_username");
+		// "sip_username");
 		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_IMPU, String.format("sip:%s@%s", Constants.USERNAME, Constants.DOMAIN)); 
-		        //String.format("sip:%s@%s", "sip_username", "sip_domain"));
+		//String.format("sip:%s@%s", "sip_username", "sip_domain"));
 		mConfigurationService.putString(NgnConfigurationEntry.IDENTITY_PASSWORD, Constants.IDENTITY_PASSWORD);
-		                                   // "sip_password");
+		// "sip_password");
 		mConfigurationService.putString(NgnConfigurationEntry.NETWORK_PCSCF_HOST, Constants.NETWORK_PCSCF_HOST); 
-		                                    //"sip_server_host");
+		//"sip_server_host");
 		mConfigurationService.putInt(NgnConfigurationEntry.NETWORK_PCSCF_PORT, Constants.NETWORK_PCSCF_PORT);
-		                                    //"sip_server_port");
+		//"sip_server_port");
 		mConfigurationService.putString(NgnConfigurationEntry.NETWORK_REALM, Constants.NETWORK_REALM);
-		                                    //"sip_domain");
+		//"sip_domain");
 		// By default, using 3G for calls disabled
 
 		mConfigurationService.putBoolean(NgnConfigurationEntry.NETWORK_USE_3G,
-		                                    true);
+				true);
 		// You may want to leave the registration timeout to the default 1700 seconds
 
 		mConfigurationService.putInt(NgnConfigurationEntry.NETWORK_REGISTRATION_TIMEOUT,
-		                                3600);
+				3600);
 		mConfigurationService.commit();
 	}
 
-public void initializeManager() {
-	if(!mEngine.isStarted()){
-		    if(!mEngine.start()){
-		      Log.e("NGN", "Failed to start the engine :(");
-		      return;
-		    }
-		  }
-		  
-		  // Register
+	public void initializeManager() {
+		if(!mEngine.isStarted()){
+			if(!mEngine.start()){
+				Log.e("NGN", "Failed to start the engine :(");
+				return;
+			}
+		}
 
-		  if(!mSipService.isRegistered()){
-		    mSipService.register(this);
-		  }
+		// Register
+
+		if(!mSipService.isRegistered()){
+			mSipService.register(this);
+		}
 	}
-	
-@Override
-protected void onResume() {
-  super.onResume();
-  Log.i("DEBUG", "OnResume");
-//  registerReceiver(regBroadcastReceiver, regIntentFilter);
-//  registerReceiver(callStateReceiver, callIntentFilter);
-//  registerReceiver(textReceiver, textIntentFilter);
-}
- 
-@Override
-protected void onPause() {
-	Log.i("DEBUG", "OnPause");
-//	unregisterReceiver(regBroadcastReceiver);
-//	unregisterReceiver(callStateReceiver);
-//	unregisterReceiver(textReceiver);
-  super.onPause();
-} 
 
-@Override
-protected void onDestroy() {
-	Log.i("DEBUG", "OnDestroy");
-	 if(mEngine.isStarted()){
-         mEngine.stop();
-     }
-	 if(regBroadcastReceiver != null){
-		 unregisterReceiver(regBroadcastReceiver);
-		 regBroadcastReceiver = null;
-	 }
-	 if(callStateReceiver != null){
-		 unregisterReceiver(callStateReceiver);
-		 callStateReceiver = null;
-	 }
-  super.onDestroy();
-}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.i("DEBUG", "OnResume");
+		//  registerReceiver(regBroadcastReceiver, regIntentFilter);
+		//  registerReceiver(callStateReceiver, callIntentFilter);
+		//  registerReceiver(textReceiver, textIntentFilter);
+	}
+
+	@Override
+	protected void onPause() {
+		Log.i("DEBUG", "OnPause");
+		//	unregisterReceiver(regBroadcastReceiver);
+		//	unregisterReceiver(callStateReceiver);
+		//	unregisterReceiver(textReceiver);
+		super.onPause();
+	} 
+
+	@Override
+	protected void onDestroy() {
+		Log.i("DEBUG", "OnDestroy");
+		if(mEngine.isStarted()){
+			mEngine.stop();
+		}
+		if(regBroadcastReceiver != null){
+			unregisterReceiver(regBroadcastReceiver);
+			regBroadcastReceiver = null;
+		}
+		if(callStateReceiver != null){
+			unregisterReceiver(callStateReceiver);
+			callStateReceiver = null;
+		}
+		super.onDestroy();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
