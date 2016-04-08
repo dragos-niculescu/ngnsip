@@ -19,7 +19,6 @@ public class CallStateReceiver extends BroadcastReceiver {
 		// TODO Auto-generated method stub
 
 	    final String action = intent.getAction();
-	    Log.i("DEBUG", "CallStateReceiver onReceive, action=" + action);
 	    
 	    if(NgnInviteEventArgs.ACTION_INVITE_EVENT.equals(action)){
 	      NgnInviteEventArgs args = 
@@ -37,7 +36,6 @@ public class CallStateReceiver extends BroadcastReceiver {
 
 	      final InviteState callState = avSession.getState();
 	      NgnEngine mEngine = NgnEngine.getInstance();
-	      Log.i("DEBUG", "CallStateReceiver onReceive, state=" + callState);
 	      
 	      switch(callState){
 	        case NONE:

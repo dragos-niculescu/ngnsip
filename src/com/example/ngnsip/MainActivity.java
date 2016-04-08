@@ -13,6 +13,7 @@ import org.doubango.ngn.utils.NgnConfigurationEntry;
 import org.doubango.ngn.utils.NgnUriUtils;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -23,24 +24,30 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
-	private NgnEngine mEngine;
-	private INgnSipService mSipService;
+	private NgnEngine mEngine = null;
+	public INgnSipService mSipService = null;
 	private IntentFilter regIntentFilter; 
 	private IntentFilter callIntentFilter;
-	private IntentFilter textIntentFilter;
 	private RegistrationBroadcastReceiver regBroadcastReceiver;
 	private CallStateReceiver callStateReceiver;
-	private TextReceiver textReceiver;
 	private NgnAVSession mSession = null; 
 	String destinationAddr = "";
+	
+	public static MainActivity instance;
+	public MainActivity getInstance(){
+	    return instance;
+	}
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		 
+		instance = this;
+		
 	mEngine = NgnEngine.getInstance();
 	if(mEngine == null)
 		Log.i("DEBUG", "mEngine null" );
@@ -62,14 +69,19 @@ public class MainActivity extends Activity {
 	  callIntentFilter.addAction(NgnInviteEventArgs.ACTION_INVITE_EVENT);
 	  registerReceiver(callStateReceiver, callIntentFilter);
 	
-	  textIntentFilter = new IntentFilter();
-	  textReceiver = new TextReceiver(this);
-	  textIntentFilter.addAction(NgnMessagingEventArgs.ACTION_MESSAGING_EVENT);
-	  registerReceiver(textReceiver, textIntentFilter);
-
-	  TextView chat = (TextView)findViewById(R.id.textView_chat);
-	  chat.setMovementMethod(new ScrollingMovementMethod());
-		
+	  		
+	  Button buttonchat = (Button)findViewById(R.id.button_startchat );
+		buttonchat.setOnClickListener(new Button.OnClickListener(){	
+	          @Override 
+	          public void onClick(View view) { 	        	  
+	        	  Intent intent = new Intent (getApplicationContext() , ChatActivity.class);
+	        	  EditText dest = (EditText)findViewById(R.id.editText_destination);
+	        	  intent.putExtra("SIPADDR", dest.getText().toString());
+	        	  startActivity(intent);
+	          }
+	        });
+		 
+	  
 		Button button = (Button)findViewById(R.id.button_register );
 		button.setOnClickListener(new Button.OnClickListener(){	
 	          @Override
@@ -91,23 +103,23 @@ public class MainActivity extends Activity {
 		buttoncall.setOnClickListener(new Button.OnClickListener(){	
 	          @Override
 	          public void onClick(View view) {
-		EditText sipaddr = (EditText)findViewById(R.id.editText_destination );
-		  final String validUri = NgnUriUtils.makeValidSipUri("sip:" + sipaddr.getText().toString());
+	        	  EditText sipaddr = (EditText)findViewById(R.id.editText_destination );
+	        	  final String validUri = NgnUriUtils.makeValidSipUri("sip:" + sipaddr.getText().toString());
 			      //String.format("sip:%s@%s", "echo", "conference.sip2sip.info"));
-			    if(validUri == null){
-			      Log.e("DEBUG", "Invalid number");
-			      return;
-			    }
+	        	  if(validUri == null){
+	        		  Log.e("DEBUG", "Invalid number");
+	        		  return;
+	        	  }
 			    
-			     mSession = NgnAVSession.createOutgoingSession(
-			      NgnEngine.getInstance().getSipService().getSipStack(), NgnMediaType.Audio);
-			    if(mSession.makeCall(validUri)){ 
+	        	  mSession = NgnAVSession.createOutgoingSession(
+	        			  NgnEngine.getInstance().getSipService().getSipStack(), NgnMediaType.Audio);
+	        	  if(mSession.makeCall(validUri)){ 
 			    	Log.d("DEBUG", "Call OK");
-			    } else {
-			    	Log.d("DEBUG", "Call failed");
-			    }
-	          }
-		 });
+	        	  } else {
+	        		  Log.d("DEBUG", "Call failed");
+	        	  }
+	          	}
+		 	});
 		
 		Button BtHangUp = (Button)findViewById(R.id.button_hangup);
         
@@ -154,42 +166,7 @@ public class MainActivity extends Activity {
         });	
 */
         
-		Button BtSendTxt = (Button)findViewById(R.id.button_sendtxt);
-        BtSendTxt.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(mSession != null){
-					EditText textToSend = (EditText)findViewById(R.id.editText_chatline );
-					EditText dest = (EditText)findViewById(R.id.editText_destination);
-					final String remotePartyUri = "sip:" + dest.getText().toString();
-					// remote party
-					final NgnMessagingSession imSession =
-							NgnMessagingSession.createOutgoingSession(mSipService.getSipStack(),
-									remotePartyUri);
-					if(!imSession.sendTextMessage(textToSend.getText().toString() )){
-						Log.e("DEBUG","Failed to send");
-					} 
-					else{
-						Log.d("DEBUG","Message sent");
-						
-						TextView chat = (TextView)findViewById(R.id.textView_chat);
-						
-						String chat_str = chat.getText().toString();
-						chat.setText(chat_str + "\nMe: " + textToSend.getText().toString());
-						final int scrollAmount = chat.getLayout().getLineTop(chat.getLineCount()) - chat.getHeight();
-					    // if there is no need to scroll, scrollAmount will be <=0
-					    if (scrollAmount > 0)
-					        chat.scrollTo(0, scrollAmount);
-					    else
-					        chat.scrollTo(0, 0);
-						textToSend.setText("");
-					}
-        // release session
-					NgnMessagingSession.releaseSession(imSession);
-				}
-			}
-		});
-        
+	    
         Button BtSendDTMF = (Button)findViewById(R.id.button_send_dtmf );
         BtSendDTMF.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -264,6 +241,7 @@ public void initializeManager() {
 @Override
 protected void onResume() {
   super.onResume();
+  Log.i("DEBUG", "OnResume");
 //  registerReceiver(regBroadcastReceiver, regIntentFilter);
 //  registerReceiver(callStateReceiver, callIntentFilter);
 //  registerReceiver(textReceiver, textIntentFilter);
@@ -276,7 +254,7 @@ protected void onPause() {
 //	unregisterReceiver(callStateReceiver);
 //	unregisterReceiver(textReceiver);
   super.onPause();
-}
+} 
 
 @Override
 protected void onDestroy() {
@@ -291,10 +269,6 @@ protected void onDestroy() {
 	 if(callStateReceiver != null){
 		 unregisterReceiver(callStateReceiver);
 		 callStateReceiver = null;
-	 }
-	 if(textReceiver != null){
-		 unregisterReceiver(textReceiver);
-		 textReceiver = null; 
 	 }
   super.onDestroy();
 }

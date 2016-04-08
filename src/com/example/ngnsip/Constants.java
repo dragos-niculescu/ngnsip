@@ -1,7 +1,7 @@
 package com.example.ngnsip;
 
 public class Constants {
-	final public static String IDENTITY_IMPI = "eim_getonsip";
+	final public static String IDENTITY_IMPI = "getonsip_eim";
 	final public static String USERNAME = "eim";
 	final public static String DOMAIN = "getonsip.com";
 	final public static String IDENTITY_PASSWORD = "gEyBBh7vn6svrGWD";

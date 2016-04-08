@@ -31,23 +31,26 @@ public class RegistrationBroadcastReceiver extends BroadcastReceiver {
 	        Log.d("DEBUG", "Invalid event args");
 	        return;
 	      }
+	      status = (TextView)mActivity.findViewById(R.id.textview_reg );
 	      switch(args.getEventType()){
 	        case REGISTRATION_NOK:
 	        	Toast.makeText(context, "Failed to register", Toast.LENGTH_SHORT).show();
+	        	status.setText("Failed");
 	          Log.d("DEBUG", "Failed to register :(");
 	          break;
 	        case UNREGISTRATION_OK:
-	        	status = (TextView)mActivity.findViewById(R.id.textview_reg );
+	        	
 	        	status.setText("Unregistered");
 	        	Log.d("DEBUG", "You are now unregistered :(");
 	        	break;
 	        case REGISTRATION_OK:
-	        	status = (TextView)mActivity.findViewById(R.id.textview_reg );
+	        	
 	        	status.setText(Constants.USERNAME + "@" + Constants.DOMAIN);
 	        	
 	          Log.d("DEBUG", "You are now registered :)");
 	          break;
 	        case REGISTRATION_INPROGRESS:
+	        	status.setText("In progress");
 	          Log.d("DEBUG", "Trying to register...");
 	          break;
 	        case UNREGISTRATION_INPROGRESS:
