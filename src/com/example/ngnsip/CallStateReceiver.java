@@ -50,6 +50,7 @@ public class CallStateReceiver extends BroadcastReceiver {
 			switch(callState){
 			case NONE:
 			default:
+				Log.i("DEBUG", "Call state " + callState);
 				break;
 			case INCOMING:
 				Log.i("DEBUG", "Incoming call");
@@ -75,8 +76,8 @@ public class CallStateReceiver extends BroadcastReceiver {
 				mEngine.getSoundService().stopRingTone();
 				break;
 			case TERMINATED:
+			case TERMINATING:
 				Log.i("DEBUG", "Call terminated");
-				
 				status.setText("No call");
 				mEngine.getSoundService().stopRingTone();
 				mEngine.getSoundService().stopRingBackTone();
